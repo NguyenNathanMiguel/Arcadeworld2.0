@@ -128,7 +128,8 @@ const TicketPrize = {
         if (item.id === 'among') {
             this.crewmate(ctx, '#e74b65');
         } else {
-            ctx.fillStyle = playerColor || '#66fcf1';
+            // Base mannequin matches the gray attendant on display at the counter.
+            ctx.fillStyle = '#999da8';
             ctx.fillRect(-10, -10, 20, 20);
             ctx.beginPath();
             ctx.arc(0, -15, 8, 0, Math.PI * 2);
@@ -136,19 +137,28 @@ const TicketPrize = {
             if (item.id === 'hat') this.hat(ctx);
             if (item.id === 'tank') {
                 ctx.fillStyle = '#f5f1de';
-                ctx.fillRect(-7, -7, 14, 17);
-                ctx.fillRect(-7, -11, 4, 7);
-                ctx.fillRect(3, -11, 4, 7);
+                ctx.beginPath();
+                ctx.roundRect(-8, -7, 16, 18, 4);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.roundRect(-6, -12, 3, 7, 1.5);
+                ctx.roundRect(3, -12, 3, 7, 1.5);
+                ctx.fill();
             }
             if (item.id === 'jersey') {
                 ctx.fillStyle = '#df304b';
-                ctx.fillRect(-10, -9, 20, 19);
-                ctx.fillRect(-14, -9, 28, 6);
+                ctx.beginPath();
+                ctx.roundRect(-9, -9, 18, 19, 3);
+                ctx.fill();
+                ctx.fillRect(-13, -9, 6, 6);
+                ctx.fillRect(7, -9, 6, 6);
                 ctx.fillStyle = '#fff3df';
                 ctx.fillRect(-3, -9, 6, 2);
-                ctx.font = 'bold 15px sans-serif';
+                ctx.font = 'bold 14px sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText('7', 0, 7);
+                ctx.textBaseline = 'middle';
+                ctx.fillText('7', 0, 4);
+                ctx.textBaseline = 'alphabetic';
             }
         }
         ctx.restore();
