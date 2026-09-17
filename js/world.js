@@ -76,7 +76,7 @@ class World {
         //
         // TOP WALL: machines go RIGHT (dx=+50), sát tường trên (y=160 center, wall at y=100-120)
         // Interior x: 120 to 1480. 4 groups, each 5*50=250px wide. Start at 200,530,860,1190.
-        // Pop the Lock: x=200,250,300,350,400
+        // Pop the Lock: x=240,290,340,390,440 (clear of the left-wall row that ends at x=180)
         // Ball Drop:    x=530,580,630,680,730
         // Color Match:  x=860,910,960,1010,1060
         // Stacker:      x=1190,1240,1290,1340,1390 (1390+25=1415 < 1480 ✓)
@@ -96,7 +96,7 @@ class World {
             { def: gameDefs.find(g => g.key === 'game1'), startX: 160, startY: 810, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
 
             // TOP WALL — going RIGHT
-            { def: gameDefs.find(g => g.key === 'game7'), startX: 200, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
+            { def: gameDefs.find(g => g.key === 'game7'), startX: 240, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
             { def: gameDefs.find(g => g.key === 'game5'), startX: 530, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
             { def: gameDefs.find(g => g.key === 'game6'), startX: 860, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
             { def: gameDefs.find(g => g.key === 'game11'), startX: 1190, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
