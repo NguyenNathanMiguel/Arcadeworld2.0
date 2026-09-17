@@ -138,26 +138,26 @@ const TicketPrize = {
             if (item.id === 'tank') {
                 ctx.fillStyle = '#f5f1de';
                 ctx.beginPath();
-                ctx.roundRect(-8, -7, 16, 18, 4);
+                ctx.roundRect(-10, -10, 20, 20, 4);
                 ctx.fill();
                 ctx.beginPath();
-                ctx.roundRect(-6, -12, 3, 7, 1.5);
-                ctx.roundRect(3, -12, 3, 7, 1.5);
+                ctx.roundRect(-7, -14, 3, 8, 1.5);
+                ctx.roundRect(4, -14, 3, 8, 1.5);
                 ctx.fill();
             }
             if (item.id === 'jersey') {
                 ctx.fillStyle = '#df304b';
                 ctx.beginPath();
-                ctx.roundRect(-9, -9, 18, 19, 3);
+                ctx.roundRect(-10, -10, 20, 20, 3);
                 ctx.fill();
-                ctx.fillRect(-13, -9, 6, 6);
-                ctx.fillRect(7, -9, 6, 6);
+                ctx.fillRect(-14, -10, 6, 6);
+                ctx.fillRect(8, -10, 6, 6);
                 ctx.fillStyle = '#fff3df';
-                ctx.fillRect(-3, -9, 6, 2);
+                ctx.fillRect(-3, -10, 6, 2);
                 ctx.font = 'bold 14px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('7', 0, 4);
+                ctx.fillText('7', 0, 3);
                 ctx.textBaseline = 'alphabetic';
             }
         }
