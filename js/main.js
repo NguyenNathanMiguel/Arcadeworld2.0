@@ -32,7 +32,8 @@ const STATES = {
     CONNECTING: 1,
     WORLD: 2,
     PLAYING_GAME: 3,
-    LEADERBOARD: 4
+    LEADERBOARD: 4,
+    SHOP: 5
 };
 
 let currentState = STATES.NAME_ENTRY;
@@ -101,6 +102,11 @@ function switchState(newState) {
 
         case STATES.LEADERBOARD:
             showLeaderboardUI();
+            break;
+
+        case STATES.SHOP:
+            localPlayer.moving = false;
+            TicketPrize.open(uiLayer, localPlayer.color, () => switchState(STATES.WORLD));
             break;
     }
 }
@@ -238,8 +244,13 @@ function closeLeaderboard() {
 }
 
 window.addEventListener('keydown', (e) => {
-    if (e.code === 'Escape' && currentState === STATES.LEADERBOARD) {
-        closeLeaderboard();
+    if (e.code === 'Escape' && (currentState === STATES.LEADERBOARD || currentState === STATES.SHOP)) {
+        switchState(STATES.WORLD);
+    }
+    // The close button is the shop's only enabled control; keep focus inside it.
+    if (e.code === 'Tab' && currentState === STATES.SHOP) {
+        e.preventDefault();
+        uiLayer.querySelector('.prize-store-close').focus();
     }
 });
 
@@ -324,7 +335,7 @@ function gameLoop(timestamp) {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if (currentState === STATES.WORLD || currentState === STATES.LEADERBOARD) {
+    if (currentState === STATES.WORLD || currentState === STATES.LEADERBOARD || currentState === STATES.SHOP) {
         if (currentState === STATES.WORLD) {
             let oldX = localPlayer.x, oldY = localPlayer.y;
             world.update(dt, localPlayer, input);
@@ -339,6 +350,8 @@ function gameLoop(timestamp) {
                         startGameAtCabinet(interactable.target);
                     } else if (interactable.type === 'leaderboard') {
                         switchState(STATES.LEADERBOARD);
+                    } else if (interactable.type === 'shop') {
+                        switchState(STATES.SHOP);
                     }
                 }
             }
