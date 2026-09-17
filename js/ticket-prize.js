@@ -137,19 +137,13 @@ const TicketPrize = {
             if (item.id === 'hat') this.hat(ctx);
             if (item.id === 'tank') {
                 ctx.fillStyle = '#f5f1de';
-                ctx.beginPath();
-                ctx.roundRect(-10, -10, 20, 20, 4);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.roundRect(-7, -14, 3, 8, 1.5);
-                ctx.roundRect(4, -14, 3, 8, 1.5);
-                ctx.fill();
+                ctx.fillRect(-10, -10, 20, 20);
+                ctx.fillRect(-7, -11, 3, 4);
+                ctx.fillRect(4, -11, 3, 4);
             }
             if (item.id === 'jersey') {
                 ctx.fillStyle = '#df304b';
-                ctx.beginPath();
-                ctx.roundRect(-10, -10, 20, 20, 3);
-                ctx.fill();
+                ctx.fillRect(-10, -10, 20, 20);
                 ctx.fillRect(-14, -10, 6, 6);
                 ctx.fillRect(8, -10, 6, 6);
                 ctx.fillStyle = '#fff3df';
