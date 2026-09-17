@@ -1,10 +1,10 @@
 // Ticket Prize artwork and catalog. Purchases/ticket balances are intentionally not enabled yet.
 const TicketPrize = {
     items: [
-        { id: 'hat', name: 'Nón', category: 'PHỤ KIỆN', price: 500, color: '#ffcc00' },
-        { id: 'tank', name: 'Áo 3 lỗ', category: 'TRANG PHỤC', price: 1000, color: '#66fcf1' },
-        { id: 'among', name: 'Skin Among Us', category: 'SKIN', price: 5000, color: '#b829ea' },
-        { id: 'jersey', name: 'Áo số 7 màu đỏ', category: 'TRANG PHỤC', price: 7000, color: '#ff5574' }
+        { id: 'hat', name: 'Hat', category: 'ACCESSORY', price: 500, color: '#ffcc00' },
+        { id: 'tank', name: 'Tank Top', category: 'OUTFIT', price: 1000, color: '#66fcf1' },
+        { id: 'among', name: 'Among Us Skin', category: 'SKIN', price: 5000, color: '#b829ea' },
+        { id: 'jersey', name: 'Red Jersey #7', category: 'OUTFIT', price: 7000, color: '#ff5574' }
     ],
 
     hat(ctx) {
@@ -173,17 +173,17 @@ const TicketPrize = {
             <div class="prize-store-backdrop">
                 <section class="prize-store" role="dialog" aria-modal="true" aria-labelledby="prize-store-title" aria-describedby="prize-store-note">
                     <header class="prize-store-header">
-                        <div><p class="prize-store-eyebrow">TICKET PRIZE / PLAYER SKINS</p><h2 id="prize-store-title">SKIN STORE<span>Đổi phong cách. Vào cuộc chơi.</span></h2></div>
-                        <button class="prize-store-close" type="button" aria-label="Đóng cửa hàng">×</button>
+                        <div><p class="prize-store-eyebrow">TICKET PRIZE / PLAYER SKINS</p><h2 id="prize-store-title">SKIN STORE<span>Change your look. Enter the game.</span></h2></div>
+                        <button class="prize-store-close" type="button" aria-label="Close shop">×</button>
                     </header>
                     <div class="prize-store-grid">
                         ${this.items.map((item, index) => `
                             <article class="prize-item" style="--item-color:${item.color}">
                                 <div class="prize-item-art"><span class="prize-item-number">0${index + 1}</span><canvas width="220" height="160" data-skin="${item.id}" role="img" aria-label="${item.name}"></canvas></div>
-                                <div class="prize-item-details"><p class="prize-item-category">${item.category}</p><h3>${item.name}</h3><p class="prize-item-price">${item.price.toLocaleString('en-US')} <span>tick</span></p><button type="button" disabled>Sắp mở bán</button></div>
+                                <div class="prize-item-details"><p class="prize-item-category">${item.category}</p><h3>${item.name}</h3><p class="prize-item-price">${item.price.toLocaleString('en-US')} <span>tick</span></p><button type="button" disabled>Coming Soon</button></div>
                             </article>`).join('')}
                     </div>
-                    <footer class="prize-store-footer"><p id="prize-store-note"><span>i</span> Hiện chỉ trưng bày skin. Hệ thống tick và mua đồ sẽ được thêm sau.</p><span class="prize-store-hint">ESC để đóng</span></footer>
+                    <footer class="prize-store-footer"><p id="prize-store-note"><span>i</span> Skins are on display only for now. Ticket currency and purchasing will be added soon.</p><span class="prize-store-hint">ESC to close</span></footer>
                 </section>
             </div>`;
         for (const item of this.items) {
