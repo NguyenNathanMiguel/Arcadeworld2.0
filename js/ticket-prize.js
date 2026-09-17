@@ -68,7 +68,7 @@ const TicketPrize = {
 
         // Toy-filled shelves behind the attendant, on the wall side.
         for (let row = 0; row < 3; row++) {
-            const y = 74 + row * 74;
+            const y = 64 + row * 70;
             ctx.fillStyle = '#302b3b';
             ctx.fillRect(104, y - 32, 68, 62);
             for (let col = 0; col < 2; col++) {
@@ -82,27 +82,27 @@ const TicketPrize = {
             ctx.fillStyle = '#dba754';
             ctx.fillRect(103, y + 24, 70, 5);
         }
-        drawPlayer(ctx, { x: 66, y: 150, color: '#999da8', name: '', moving: false }, 0);
+        drawPlayer(ctx, { x: 66, y: 140, color: '#999da8', name: '', moving: false }, 0);
         ctx.save();
-        ctx.translate(66, 150);
+        ctx.translate(66, 140);
         this.hat(ctx);
         ctx.restore();
 
         // Half-circle counter faces the aisle to the left; the straight edge is behind it.
         ctx.save();
-        ctx.translate(74, 150);
+        ctx.translate(74, 140);
         ctx.fillStyle = '#533750';
         ctx.beginPath();
-        ctx.ellipse(0, 5, 66, 100, 0, Math.PI / 2, Math.PI * 1.5);
-        ctx.ellipse(0, 5, 42, 74, 0, Math.PI * 1.5, Math.PI / 2, true);
+        ctx.ellipse(0, 5, 66, 92, 0, Math.PI / 2, Math.PI * 1.5);
+        ctx.ellipse(0, 5, 42, 68, 0, Math.PI * 1.5, Math.PI / 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = '#af7144';
         ctx.strokeStyle = '#ffcc00';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.ellipse(0, 0, 66, 100, 0, Math.PI / 2, Math.PI * 1.5);
-        ctx.ellipse(0, 0, 42, 74, 0, Math.PI * 1.5, Math.PI / 2, true);
+        ctx.ellipse(0, 0, 66, 92, 0, Math.PI / 2, Math.PI * 1.5);
+        ctx.ellipse(0, 0, 42, 68, 0, Math.PI * 1.5, Math.PI / 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();

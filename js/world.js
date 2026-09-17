@@ -50,7 +50,7 @@ class World {
         // Ticket Prize zone — placed INSIDE the arcade, between PushCar and Boxing on the right side
         // Right wall interior is at x=1480. Machines on right wall are at x=1440 (center), extending to x=1460.
         // Put Ticket Prize to the left of those machines, at x=1290–1390.
-        this.ticketPrizeZone = { x: 1300, y: 440, w: 180, h: 270, color: '#ffcc00' };
+        this.ticketPrizeZone = { x: 1300, y: 460, w: 180, h: 250, color: '#ffcc00' };
         // Reserve the counter/staff area; customers approach from the left aisle.
         this.ticketPrizeObstacle = { ...this.ticketPrizeZone };
 
