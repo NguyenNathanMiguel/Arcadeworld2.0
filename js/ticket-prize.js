@@ -19,45 +19,40 @@ const TicketPrize = {
     },
 
     crewmate(ctx, color) {
+        ctx.lineJoin = 'round';
         ctx.strokeStyle = '#141522';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.roundRect(-14, -8, 8, 19, 3);
+        ctx.roundRect(-14, -7, 8, 22, 4);
         ctx.fill();
         ctx.stroke();
         ctx.beginPath();
-        ctx.roundRect(-9, -21, 23, 34, [11, 11, 5, 5]);
+        ctx.roundRect(-9, -21, 23, 40, [12, 12, 9, 9]);
         ctx.fill();
         ctx.stroke();
-        ctx.fillRect(-8, 8, 8, 11);
-        ctx.fillRect(6, 8, 8, 11);
         ctx.fillStyle = '#95e3f3';
         ctx.beginPath();
         ctx.roundRect(-2, -15, 19, 11, 5);
         ctx.fill();
         ctx.stroke();
         ctx.fillStyle = '#e6fbff';
-        ctx.fillRect(2, -13, 10, 3);
+        ctx.fillRect(2, -13, 9, 3);
     },
 
     bear(ctx, color) {
         ctx.fillStyle = color;
-        for (const [x, y, r] of [[-9, -18, 6], [9, -18, 6], [0, -10, 13], [0, 9, 13], [-13, 5, 6], [13, 5, 6], [-8, 20, 6], [8, 20, 6]]) {
+        for (const [x, y, r] of [[-10, -17, 6], [10, -17, 6], [0, -9, 13]]) {
             ctx.beginPath();
             ctx.arc(x, y, r, 0, Math.PI * 2);
             ctx.fill();
         }
-        ctx.fillStyle = '#ffe0bb';
         ctx.beginPath();
-        ctx.ellipse(0, 9, 8, 10, 0, 0, Math.PI * 2);
+        ctx.roundRect(-12, 2, 24, 22, 10);
         ctx.fill();
         ctx.fillStyle = '#28202b';
-        ctx.fillRect(-6, -13, 3, 3);
-        ctx.fillRect(4, -13, 3, 3);
-        ctx.fillRect(-2, -7, 4, 3);
-        ctx.fillStyle = '#ff5574';
-        ctx.fillRect(-6, 0, 12, 3);
+        ctx.fillRect(-6, -12, 3, 3);
+        ctx.fillRect(4, -12, 3, 3);
     },
 
     drawZone(ctx, zone, drawPlayer) {
@@ -73,54 +68,52 @@ const TicketPrize = {
 
         // Toy-filled shelves behind the attendant, on the wall side.
         for (let row = 0; row < 3; row++) {
-            const y = 48 + row * 57;
+            const y = 74 + row * 74;
             ctx.fillStyle = '#302b3b';
-            ctx.fillRect(76, y - 25, 45, 48);
+            ctx.fillRect(104, y - 32, 68, 62);
             for (let col = 0; col < 2; col++) {
                 ctx.save();
-                ctx.translate(87 + col * 24, y);
-                ctx.scale(0.52, 0.52);
+                ctx.translate(121 + col * 34, y);
+                ctx.scale(0.62, 0.62);
                 if ((row + col) % 2 === 0) this.crewmate(ctx, ['#ff5574', '#66fcf1', '#b829ea'][row]);
                 else this.bear(ctx, row === 1 ? '#dba3cf' : '#b98052');
                 ctx.restore();
             }
             ctx.fillStyle = '#dba754';
-            ctx.fillRect(75, y + 15, 48, 4);
+            ctx.fillRect(103, y + 24, 70, 5);
         }
-        drawPlayer(ctx, { x: 58, y: 117, color: '#999da8', name: '', moving: false }, 0);
+        drawPlayer(ctx, { x: 66, y: 150, color: '#999da8', name: '', moving: false }, 0);
         ctx.save();
-        ctx.translate(58, 117);
+        ctx.translate(66, 150);
         this.hat(ctx);
         ctx.restore();
 
         // Half-circle counter faces the aisle to the left; the straight edge is behind it.
         ctx.save();
-        ctx.translate(65, 115);
+        ctx.translate(74, 150);
         ctx.fillStyle = '#533750';
         ctx.beginPath();
-        ctx.ellipse(0, 5, 61, 78, 0, Math.PI / 2, Math.PI * 1.5);
-        ctx.ellipse(0, 5, 38, 57, 0, Math.PI * 1.5, Math.PI / 2, true);
+        ctx.ellipse(0, 5, 66, 100, 0, Math.PI / 2, Math.PI * 1.5);
+        ctx.ellipse(0, 5, 42, 74, 0, Math.PI * 1.5, Math.PI / 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.fillStyle = '#af7144';
         ctx.strokeStyle = '#ffcc00';
         ctx.lineWidth = 3;
         ctx.beginPath();
-        ctx.ellipse(0, 0, 61, 78, 0, Math.PI / 2, Math.PI * 1.5);
-        ctx.ellipse(0, 0, 38, 57, 0, Math.PI * 1.5, Math.PI / 2, true);
+        ctx.ellipse(0, 0, 66, 100, 0, Math.PI / 2, Math.PI * 1.5);
+        ctx.ellipse(0, 0, 42, 74, 0, Math.PI * 1.5, Math.PI / 2, true);
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
         ctx.restore();
 
         ctx.fillStyle = '#262231';
-        ctx.fillRect(8, 5, 114, 20);
-        ctx.font = 'bold 11px Orbitron, sans-serif';
+        ctx.fillRect(10, 6, zone.w - 20, 22);
+        ctx.font = 'bold 12px Orbitron, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillStyle = '#ffdc65';
-        ctx.fillText('TICKET PRIZE', 65, 19);
-        ctx.font = '9px Inter, sans-serif';
-        ctx.fillText('SKINS & TOYS', 65, 211);
+        ctx.fillText('TICKET PRIZE', zone.w / 2, 22);
         ctx.restore();
     },
 
