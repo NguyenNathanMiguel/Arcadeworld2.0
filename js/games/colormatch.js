@@ -43,6 +43,9 @@ class ColorMatchGame {
     }
 
     init() {
+        this.score = 0;
+        this.isGameOver = false;
+        this.roundsLeft = 3;
         this.startNewRound();
     }
 
@@ -50,6 +53,7 @@ class ColorMatchGame {
         this.roundScore = 0;
         this.rotationAngle = 0;
         this.targetRotationAngle = 0;
+        this.flashInterval = 0.5; // Reset speed for the new round
         this.targetColor = this.colors[Math.floor(Math.random() * this.colors.length)];
         this.sections = new Array(this.numSections).fill(null);
         this.sections[0] = this.targetColor;
@@ -92,6 +96,7 @@ class ColorMatchGame {
                     this.sections[secIdx] = this.targetColor;
                     this.roundScore += 25;
                     this.currentStep++;
+                    this.flashInterval = Math.max(0.1, this.flashInterval - 0.025); // Speed up slightly!
                     if (this.currentStep >= this.colorOrder.length) {
                         this.endRound(true);
                     } else {

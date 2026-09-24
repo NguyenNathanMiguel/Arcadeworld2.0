@@ -19,7 +19,7 @@ class BasketballGame {
         }
         
         this.gravity = 1500;
-        this.slopeGravity = 400;
+        this.slopeFriction = 0.3;
         
         this.hoopY = 250;
         this.hoopLeft = 150;
@@ -81,11 +81,18 @@ class BasketballGame {
 
         if (this.draggingBall && !input.mouse.down) {
             let mx = input.mouse.x, my = input.mouse.y;
-            let forceX = (this.dragStart.x - mx) * 4.5;
-            let forceY = (this.dragStart.y - my) * 4.5;
-            this.draggingBall.vel = new Vector(forceX, forceY);
-            this.draggingBall.state = 'thrown';
-            this.draggingBall.scored = false;
+            let dragDx = this.dragStart.x - mx;
+            let dragDy = this.dragStart.y - my;
+            let dragDist = Math.sqrt(dragDx*dragDx + dragDy*dragDy);
+            if (dragDist > 15) {
+                // Enough drag → throw
+                let forceX = dragDx * 4.5;
+                let forceY = dragDy * 4.5;
+                this.draggingBall.vel = new Vector(forceX, forceY);
+                this.draggingBall.state = 'thrown';
+                this.draggingBall.scored = false;
+            }
+            // Too small drag → cancel, ball stays ready
             this.draggingBall = null;
         }
 
@@ -144,26 +151,41 @@ class BasketballGame {
                 if (b.pos.x > this.platformLeftX && b.pos.x < this.stopperX + 20) {
                     if (b.pos.y + b.radius > surfaceY) {
                         b.pos.y = surfaceY - b.radius;
-                        let nx = -platM, ny = 1;
-                        let mag = Math.sqrt(nx*nx + ny*ny);
-                        nx /= mag; ny /= mag;
-                        let dot = b.vel.x * nx + b.vel.y * ny;
-                        if (dot < 0) { b.vel.x -= 2*dot*nx*0.5; b.vel.y -= 2*dot*ny*0.5; }
-                        if (Math.abs(dot) < 150) { b.state = 'rolling'; b.vel.y = 0; }
+                        // Transition to rolling: keep horizontal momentum, zero out vertical
+                        b.vel.x = b.vel.x * 0.6; // lose some energy on bounce
+                        b.vel.y = 0;
+                        b.state = 'rolling';
                     }
                 }
                 if (b.pos.y > 800) { b.state = 'returning'; }
 
             } else if (b.state === 'rolling') {
-                b.vel.x += this.slopeGravity * dt;
-                b.vel.x *= 0.98;
+                // Slope gravity: g * sin(angle), pulls downhill (positive X direction)
+                let sinSlope = platM / Math.sqrt(1 + platM * platM);
+                let slopeAccel = this.gravity * sinSlope;
+
+                b.vel.x += slopeAccel * dt;
+
+                // Small rolling friction (must be less than slope accel so ball always rolls down)
+                let friction = 40;
+                if (b.vel.x > 0) {
+                    b.vel.x = Math.max(0, b.vel.x - friction * dt);
+                } else if (b.vel.x < 0) {
+                    b.vel.x = Math.min(0, b.vel.x + friction * dt);
+                }
+
                 b.pos.x += b.vel.x * dt;
                 b.pos.y = platM * b.pos.x + platB - b.radius;
+
+                // Hit stopper → reset to player
                 if (b.pos.x >= this.stopperX - b.radius) {
-                    // Reset instantly to player's hand
                     b.pos = new Vector(this.startPos.x, this.startPos.y);
                     b.vel = new Vector(0, 0);
                     b.state = 'ready';
+                }
+                // Rolled off left edge
+                if (b.pos.x < this.platformLeftX) {
+                    b.state = 'returning';
                 }
             } else if (b.state === 'returning') {
                 // Keep this as a fallback if ball falls out of bounds
@@ -232,12 +254,13 @@ class BasketballGame {
 
         let readyCount = 0;
         for (let b of this.balls) {
-            ctx.globalAlpha = (b.state === 'ready') ? 1.0 : 0.6;
+            ctx.globalAlpha = (b.state === 'ready') ? 1.0 : 0.8;
+            // Ball shadow
+            ctx.shadowColor = '#FF8C00';
+            ctx.shadowBlur = (b.state === 'ready') ? 15 : 5;
             ctx.fillStyle = '#FF8C00';
             ctx.beginPath(); ctx.arc(b.pos.x, b.pos.y, b.radius, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
-            ctx.beginPath(); ctx.moveTo(b.pos.x-b.radius, b.pos.y); ctx.lineTo(b.pos.x+b.radius, b.pos.y); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(b.pos.x, b.pos.y-b.radius); ctx.lineTo(b.pos.x, b.pos.y+b.radius); ctx.stroke();
+            ctx.shadowBlur = 0;
             ctx.globalAlpha = 1.0;
             if (b.state === 'ready') readyCount++;
         }
