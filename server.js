@@ -9,7 +9,13 @@ const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = process.env.PORT || 3000;
-const LEADERBOARD_FILE = path.join(__dirname, 'leaderboard.json');
+const DATA_DIR = path.join(__dirname, 'data');
+const LEADERBOARD_FILE = path.join(DATA_DIR, 'leaderboard.json');
+
+// Ensure data directory exists
+if (!fs.existsSync(DATA_DIR)) {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+}
 
 // Serve static files from the root directory
 app.use(express.static(__dirname));
@@ -95,7 +101,7 @@ io.on('connection', (socket) => {
             io.emit('playerEndedGame', { id: socket.id });
 
             // Update leaderboard
-            if (data.gameKey && data.score !== undefined) {
+            if (data.gameKey && data.score !== undefined && data.score > 0) {
                 if (!leaderboard[data.gameKey]) {
                     leaderboard[data.gameKey] = [];
                 }
