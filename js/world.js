@@ -58,7 +58,9 @@ class World {
         // Ticket Prize zone — placed INSIDE the arcade, between PushCar and Boxing on the right side
         // Right wall interior is at x=1480. Machines on right wall are at x=1440 (center), extending to x=1460.
         // Put Ticket Prize to the left of those machines, at x=1290–1390.
-        this.ticketPrizeZone = { x: 1290, y: 470, w: 130, h: 220, color: '#ffcc00' };
+        this.ticketPrizeZone = { x: 1300, y: 460, w: 180, h: 250, color: '#ffcc00' };
+        // Reserve the counter/staff area; customers approach from the left aisle.
+        this.ticketPrizeObstacle = { ...this.ticketPrizeZone };
 
         const gameDefs = [
             { key: 'game1', name: 'Basketball', color: '#e67e22', index: 0 },
@@ -170,7 +172,7 @@ class World {
         let canMoveX = true, canMoveY = true;
         
         // Check walls
-        for (let w of this.walls) {
+        for (let w of [...this.walls, this.ticketPrizeObstacle]) {
             if (newX - pw/2 < w.x + w.w && newX + pw/2 > w.x && player.y - ph/2 < w.y + w.h && player.y + ph/2 > w.y) canMoveX = false;
             if (player.x - pw/2 < w.x + w.w && player.x + pw/2 > w.x && newY - ph/2 < w.y + w.h && newY + ph/2 > w.y) canMoveY = false;
         }
@@ -208,6 +210,12 @@ class World {
         let lbDist = Math.hypot(px - lbCenter.x, py - lbCenter.y);
         if (lbDist < 90 && lbDist < minDist) {
             nearest = { type: 'leaderboard' };
+        }
+
+        const tp = this.ticketPrizeZone;
+        const shopDist = Math.hypot(px - tp.x, py - (tp.y + tp.h / 2));
+        if (px <= tp.x && shopDist < minDist) {
+            nearest = { type: 'shop' };
         }
 
         return nearest;
@@ -276,23 +284,7 @@ class World {
         }
         ctx.shadowBlur = 0;
 
-        // Draw Ticket Prize Zone
-        let tp = this.ticketPrizeZone;
-        if (tp) {
-            ctx.fillStyle = '#1a1a1a';
-            ctx.fillRect(tp.x, tp.y, tp.w, tp.h);
-            ctx.strokeStyle = tp.color;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(tp.x, tp.y, tp.w, tp.h);
-            ctx.font = '20px Orbitron';
-            ctx.fillStyle = tp.color;
-            ctx.textAlign = 'center';
-            ctx.save();
-            ctx.translate(tp.x - 15, tp.y + tp.h/2);
-            ctx.rotate(-Math.PI/2);
-            ctx.fillText('TICKET PRIZE', 0, 0);
-            ctx.restore();
-        }
+        TicketPrize.drawZone(ctx, this.ticketPrizeZone, this.drawPlayer.bind(this));
 
         // Zones Labels removed as requested
 
@@ -361,6 +353,10 @@ class World {
                 ctx.font = 'bold 16px Orbitron';
                 ctx.fillStyle = interactable.target.zoneColor;
                 ctx.fillText(interactable.target.gameName, px, py - 18);
+            } else if (interactable.type === 'shop') {
+                ctx.font = 'bold 14px Orbitron';
+                ctx.fillStyle = '#ffcc00';
+                ctx.fillText('TICKET PRIZE · STORE', px, py - 18);
             }
             
             ctx.font = '14px Orbitron';
