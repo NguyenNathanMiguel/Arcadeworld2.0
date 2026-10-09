@@ -26,8 +26,6 @@ class World {
         this.carpetImg = new Image();
         this.carpetImg.src = 'assets/carpet.png';
         this.carpetImg.onload = () => {
-            // Need to create pattern in draw or here if ctx is available
-            // Actually, we can just create it dynamically when drawing if we have ctx
             this.carpetLoaded = true;
         };
 
@@ -54,11 +52,15 @@ class World {
         const entranceX = 150; // entrance gap: x=150 to x=350
         this.walls.push({ x: buildingX, y: buildingY + buildingH - wallThickness, w: entranceX - buildingX, h: wallThickness });
         this.walls.push({ x: entranceX + entranceW, y: buildingY + buildingH - wallThickness, w: buildingX + buildingW - (entranceX + entranceW), h: wallThickness });
+        this.ticketShop = {
+            x: 1290, y: 470, w: 190, h: 250,    // bounding box against the right wall (1480 - 190 = 1290)
+            color: '#ffcc00',
+        };
+        this.ticketShop.npcX = this.ticketShop.x + 66;
+        this.ticketShop.npcY = this.ticketShop.y + 140;
 
-        // Ticket Prize zone — placed INSIDE the arcade, between PushCar and Boxing on the right side
-        // Right wall interior is at x=1480. Machines on right wall are at x=1440 (center), extending to x=1460.
-        // Put Ticket Prize to the left of those machines, at x=1290–1390.
-        this.ticketPrizeZone = { x: 1290, y: 470, w: 130, h: 220, color: '#ffcc00' };
+        // Keep ticketPrizeZone reference for backwards compat but redirect
+        this.ticketPrizeZone = null;
 
         const gameDefs = [
             { key: 'game1', name: 'Basketball', color: '#e67e22', index: 0 },
@@ -93,19 +95,17 @@ class World {
         //
         // CENTER: 2x5 horizontal
         // Slot Machine: y=520, x=650,720,790,860,930
-        // Claw Machine: y=700, x=650,720,790,860,930
-
         let placements = [
             // LEFT WALL — going DOWN
-            { def: gameDefs.find(g => g.key === 'game2'), startX: 160, startY: 175, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
-            { def: gameDefs.find(g => g.key === 'game9'), startX: 160, startY: 490, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
-            { def: gameDefs.find(g => g.key === 'game1'), startX: 160, startY: 810, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
+            { def: gameDefs.find(g => g.key === 'game2'), startX: 160, startY: 210, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
+            { def: gameDefs.find(g => g.key === 'game9'), startX: 160, startY: 505, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
+            { def: gameDefs.find(g => g.key === 'game1'), startX: 160, startY: 800, dx: 0, dy: 55, facing: 'right', labelOff: { x: 90, y: 0 } },
 
             // TOP WALL — going RIGHT
-            { def: gameDefs.find(g => g.key === 'game7'), startX: 200, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
+            { def: gameDefs.find(g => g.key === 'game7'), startX: 240, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
             { def: gameDefs.find(g => g.key === 'game5'), startX: 530, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
-            { def: gameDefs.find(g => g.key === 'game6'), startX: 860, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
-            { def: gameDefs.find(g => g.key === 'game11'), startX: 1190, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
+            { def: gameDefs.find(g => g.key === 'game6'), startX: 820, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
+            { def: gameDefs.find(g => g.key === 'game11'), startX: 1110, startY: 160, dx: 50, dy: 0, facing: 'down', labelOff: { x: 0, y: 70 } },
 
             // RIGHT WALL — going DOWN
             { def: gameDefs.find(g => g.key === 'game10'), startX: 1440, startY: 200, dx: 0, dy: 55, facing: 'left', labelOff: { x: -90, y: 0 } },
@@ -119,11 +119,12 @@ class World {
 
         for (let p of placements) {
             // Zone label at center of the group + offset
-            let midX = p.startX + p.dx * 2 + p.labelOff.x;
-            let midY = p.startY + p.dy * 2 + p.labelOff.y;
+            let count = p.count || 5;
+            let midX = p.startX + p.dx * (count / 2 - 0.5) + p.labelOff.x;
+            let midY = p.startY + p.dy * (count / 2 - 0.5) + p.labelOff.y;
             this.zones.push({ name: p.def.name, color: p.def.color, x: midX, y: midY });
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < count; i++) {
                 let w = (p.facing === 'down') ? 50 : 40;
                 let h = (p.facing === 'down') ? 40 : 50;
                 this.cabinets.push({
@@ -181,6 +182,13 @@ class World {
             if (player.x - pw/2 < c.x + c.w/2 && player.x + pw/2 > c.x - c.w/2 && newY - ph/2 < c.y + c.h/2 && newY + ph/2 > c.y - c.h/2) canMoveY = false;
         }
 
+        // Check ticket shop
+        if (this.ticketShop) {
+            let ts = this.ticketShop;
+            if (newX - pw/2 < ts.x + ts.w && newX + pw/2 > ts.x && player.y - ph/2 < ts.y + ts.h && player.y + ph/2 > ts.y) canMoveX = false;
+            if (player.x - pw/2 < ts.x + ts.w && player.x + pw/2 > ts.x && newY - ph/2 < ts.y + ts.h && newY + ph/2 > ts.y) canMoveY = false;
+        }
+
         // Check leaderboard
         let lb = this.leaderboardSign;
         if (newX - pw/2 < lb.x + lb.w && newX + pw/2 > lb.x && player.y - ph/2 < lb.y + lb.h && player.y + ph/2 > lb.y) canMoveX = false;
@@ -208,6 +216,13 @@ class World {
         let lbDist = Math.hypot(px - lbCenter.x, py - lbCenter.y);
         if (lbDist < 90 && lbDist < minDist) {
             nearest = { type: 'leaderboard' };
+        }
+
+        // Check ticket shop NPC
+        let ts = this.ticketShop;
+        let tsDist = Math.hypot(px - ts.npcX, py - ts.npcY);
+        if (tsDist < 80 && tsDist < minDist) {
+            nearest = { type: 'ticketshop' };
         }
 
         return nearest;
@@ -276,48 +291,14 @@ class World {
         }
         ctx.shadowBlur = 0;
 
-        // Draw Ticket Prize Zone
-        let tp = this.ticketPrizeZone;
-        if (tp) {
-            ctx.fillStyle = '#1a1a1a';
-            ctx.fillRect(tp.x, tp.y, tp.w, tp.h);
-            ctx.strokeStyle = tp.color;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(tp.x, tp.y, tp.w, tp.h);
-            ctx.font = '20px Orbitron';
-            ctx.fillStyle = tp.color;
-            ctx.textAlign = 'center';
-            ctx.save();
-            ctx.translate(tp.x - 15, tp.y + tp.h/2);
-            ctx.rotate(-Math.PI/2);
-            ctx.fillText('TICKET PRIZE', 0, 0);
-            ctx.restore();
-        }
+        // Draw Ticket Prize Shop
+        TicketPrize.drawZone(ctx, this.ticketShop, this.drawPlayer.bind(this));
 
         // Zones Labels removed as requested
 
         // Cabinets
         for (let c of this.cabinets) {
-            ctx.fillStyle = '#222';
-            ctx.fillRect(c.x - c.w/2, c.y - c.h/2, c.w, c.h);
-            
-            // Screen indicator
-            ctx.fillStyle = c.zoneColor;
-            ctx.shadowBlur = 5;
-            ctx.shadowColor = c.zoneColor;
-            
-            if (c.facing === 'down') {
-                ctx.fillRect(c.x - c.w/2 + 5, c.y - c.h/2 + 5, c.w - 10, 10);
-            } else if (c.facing === 'right') {
-                ctx.fillRect(c.x + c.w/2 - 15, c.y - c.h/2 + 5, 10, c.h - 10);
-            } else if (c.facing === 'left') {
-                ctx.fillRect(c.x - c.w/2 + 5, c.y - c.h/2 + 5, 10, c.h - 10);
-            }
-            
-            ctx.shadowBlur = 0;
-            ctx.strokeStyle = c.zoneColor;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(c.x - c.w/2, c.y - c.h/2, c.w, c.h);
+            this.drawCabinet(ctx, c);
         }
 
         // Leaderboard Sign
@@ -361,6 +342,10 @@ class World {
                 ctx.font = 'bold 16px Orbitron';
                 ctx.fillStyle = interactable.target.zoneColor;
                 ctx.fillText(interactable.target.gameName, px, py - 18);
+            } else if (interactable.type === 'ticketshop') {
+                ctx.font = 'bold 16px Orbitron';
+                ctx.fillStyle = '#ffcc00';
+                ctx.fillText('Ticket Prize Shop', px, py - 18);
             }
             
             ctx.font = '14px Orbitron';
@@ -369,6 +354,88 @@ class World {
             ctx.shadowBlur = 0;
         }
 
+        ctx.restore();
+    }
+
+    drawCabinet(ctx, c) {
+        ctx.save();
+        ctx.translate(c.x, c.y);
+        
+        // Rotate based on facing direction
+        // Default orientation: screen faces DOWN (toward positive Y)
+        if (c.facing === 'right') ctx.rotate(-Math.PI/2);
+        else if (c.facing === 'left') ctx.rotate(Math.PI/2);
+        else if (c.facing === 'up') ctx.rotate(Math.PI);
+        // 'down' = no rotation
+        
+        let w = c.w;
+        let h = c.h;
+        let col = c.zoneColor;
+        
+        // === CABINET BODY (dark box) ===
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(-w/2, -h/2, w, h);
+        
+        // === SCREEN (top portion, glowing) ===
+        let screenH = h * 0.45;
+        let screenPad = 4;
+        
+        // Screen background glow
+        ctx.shadowColor = col;
+        ctx.shadowBlur = 8;
+        ctx.fillStyle = col;
+        ctx.globalAlpha = 0.15;
+        ctx.fillRect(-w/2 + screenPad, -h/2 + screenPad, w - screenPad*2, screenH);
+        ctx.globalAlpha = 1.0;
+        
+        // Screen border
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 1.5;
+        ctx.strokeRect(-w/2 + screenPad, -h/2 + screenPad, w - screenPad*2, screenH);
+        ctx.shadowBlur = 0;
+        
+        // === CONTROL PANEL (middle strip) ===
+        let panelY = -h/2 + screenPad + screenH + 3;
+        let panelH = h * 0.2;
+        ctx.fillStyle = '#2a2a3e';
+        ctx.fillRect(-w/2 + 3, panelY, w - 6, panelH);
+        
+        // Buttons on control panel (2 small dots)
+        let btnR = 2.5;
+        ctx.fillStyle = col;
+        ctx.shadowColor = col;
+        ctx.shadowBlur = 4;
+        ctx.beginPath();
+        ctx.arc(-w/6, panelY + panelH/2, btnR, 0, Math.PI*2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(w/6, panelY + panelH/2, btnR, 0, Math.PI*2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        
+        // === BASE (bottom portion, darker) ===
+        let baseY = panelY + panelH + 2;
+        let baseH = h/2 - (baseY) + h/2 - 2;
+        if (baseH > 2) {
+            ctx.fillStyle = '#111';
+            ctx.fillRect(-w/2 + 2, baseY, w - 4, baseH);
+        }
+        
+        // === NEON TRIM (outer border glow) ===
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = col;
+        ctx.shadowBlur = 6;
+        ctx.strokeRect(-w/2, -h/2, w, h);
+        ctx.shadowBlur = 0;
+        
+        // === TOP MARQUEE (thin colored bar at very top) ===
+        ctx.fillStyle = col;
+        ctx.shadowColor = col;
+        ctx.shadowBlur = 5;
+        ctx.fillRect(-w/2 + 2, -h/2 + 1, w - 4, 3);
+        ctx.shadowBlur = 0;
+        
         ctx.restore();
     }
 
