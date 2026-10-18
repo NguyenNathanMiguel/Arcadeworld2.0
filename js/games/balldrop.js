@@ -6,12 +6,13 @@ class BallDropGame {
         // 30 seconds timer
         this.timer = new Timer(30, () => { this.isGameOver = true; });
         
-        // 8 moving buckets, spaced out more
+        // Moving buckets with shorter gap between buckets
         this.buckets = [];
-        this.bucketSpacing = 400;
-        for(let i=0; i<8; i++) {
+        this.bucketSpacing = 280;
+        const numBuckets = 6;
+        for (let i = 0; i < numBuckets; i++) {
             this.buckets.push({
-                x: i * this.bucketSpacing,
+                x: (i - 1) * this.bucketSpacing,
                 y: 600,
                 w: 120,
                 h: 150
@@ -20,7 +21,7 @@ class BallDropGame {
         this.bucketSpeed = 150;
         
         this.balls = [];
-        this.ballsLeft = 60;
+        this.ballsLeft = 50;
         
         this.tubeX = 512;
         this.tubeY = 100;
@@ -37,10 +38,11 @@ class BallDropGame {
         this.timer.update(dt);
 
         // Update buckets
+        const loopDist = this.buckets.length * this.bucketSpacing;
         for(let b of this.buckets) {
             b.x += this.bucketSpeed * dt;
-            if(b.x > 1024 + 200) {
-                b.x -= 8 * this.bucketSpacing; // loop back
+            if(b.x > 1024 + b.w) {
+                b.x -= loopDist; // loop back seamlessly
             }
         }
 

@@ -113,6 +113,28 @@ const Store = {
             return true;
         }
         return false;
+    },
+    getTicks() {
+        return parseInt(localStorage.getItem('arcade_world_ticks')) || 0;
+    },
+    addTicks(amount) {
+        const current = this.getTicks();
+        localStorage.setItem('arcade_world_ticks', current + amount);
+    },
+    spendTicks(amount) {
+        const current = this.getTicks();
+        localStorage.setItem('arcade_world_ticks', Math.max(0, current - amount));
+    },
+    hasItem(itemId) {
+        let owned = JSON.parse(localStorage.getItem('arcade_world_inventory') || '[]');
+        return owned.includes(itemId);
+    },
+    grantItem(itemId) {
+        let owned = JSON.parse(localStorage.getItem('arcade_world_inventory') || '[]');
+        if (!owned.includes(itemId)) {
+            owned.push(itemId);
+            localStorage.setItem('arcade_world_inventory', JSON.stringify(owned));
+        }
     }
 };
 

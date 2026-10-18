@@ -322,6 +322,7 @@ function showGameOver(score, gameKey) {
     activeGame = null;
 }
 
+
 function backToWorld() {
     resize();
     switchState(STATES.WORLD);
@@ -356,8 +357,8 @@ function gameLoop(timestamp) {
                         startGameAtCabinet(interactable.target);
                     } else if (interactable.type === 'leaderboard') {
                         switchState(STATES.LEADERBOARD);
-                    } else if (interactable.type === 'shop') {
-                        switchState(STATES.SHOP);
+                } else if (interactable.type === 'shop' || interactable.type === 'ticketshop') {
+                    switchState(STATES.SHOP);
                     }
                 }
             }
